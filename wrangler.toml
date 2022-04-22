@@ -1,0 +1,16 @@
+name = "routing-worker"
+type = "javascript"
+zone_id = ""
+account_id = ""
+route = ""
+workers_dev = true
+compatibility_date = "2022-04-22"
+
+kv_namespaces = [
+  { binding = "ROUTING_KEYS", id = "df86f4732c244883ab411329135e472a" }
+]
+ 
+[build]
+command = "npm install && npm run build"
+[build.upload]
+format = "service-worker"

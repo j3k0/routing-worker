@@ -102,3 +102,18 @@ dist
 
 # TernJS port file
 .tern-port
+
+#wrangler ignores
+/target
+/dist
+**/*.rs.bk
+Cargo.lock
+bin/
+pkg/
+wasm-pack.log
+worker/
+node_modules/
+.cargo-ok
+transpiled
+/.idea/
+
