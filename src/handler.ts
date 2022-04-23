@@ -127,7 +127,9 @@ export async function handleRequest(request: Request): Promise<Response> {
     const new_request_headers = new Headers(request_headers);
     const url = new URL(urlToRoute);
 
-    const requestUrl = new URL(request.url);
+    const requestUrl = new URL(request.url)
+    url.pathname = requestUrl.pathname
+    url.search = requestUrl.search
 
     new_request_headers.set('Referer', url.protocol + '//' + url.hostname);
 
@@ -140,9 +142,11 @@ export async function handleRequest(request: Request): Promise<Response> {
       const body = await readRequestBody(request);
       requestOptions = Object.assign(requestOptions, { body });
     }
-
-    const response = await fetch(decodeURIComponent(url.href + requestUrl.search), requestOptions);
-    return response;
+    const response = await fetch(
+      decodeURIComponent(url.origin + url.pathname + requestUrl.search),
+      requestOptions,
+    )
+    return response
   } catch (err) {
     return new Response(`error!: ${err}`, { status: 500 }); // return 500 Status with Error
   }

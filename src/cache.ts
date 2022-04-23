@@ -10,23 +10,22 @@ type Route = {
     expiresAt: Date;
 }
 
-const backendConfigurationCache: {
+export const backendConfigurationCache: {
     [routingKey: string]: Route
-} = {};
+} = {}
 
 const getExpirationDate = (): Date => {
     var expireAt = new Date();
     expireAt.setHours(expireAt.getHours() + 4);// add 4 hours for expiration
     return expireAt;
 }
-const isExpired = (item: Route): boolean => {
-    var now = new Date();
-    return item.expiresAt < now;
+export const isExpired = (item: Route): boolean => {
+    var now = new Date()
+    return item.expiresAt < now
 }
 
 const getCache = (key: string) => ROUTING_KEYS.get(key);
 const getDefaultRoute = async () => {
-    var now = new Date();
 
     if (!backendConfigurationCache[DEFAULT_KEY] || isExpired(backendConfigurationCache[DEFAULT_KEY])) {
         const value = await getCache(DEFAULT_KEY);

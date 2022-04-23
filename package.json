@@ -1,7 +1,7 @@
 {
   "name": "routing-worker",
   "version": "0.1.0",
-  "description": "Cloudflare worker TypeScript template",
+  "description": "Cloudflare routing worker",
   "main": "dist/worker.js",
   "scripts": {
     "build": "export NODE_OPTIONS=--openssl-legacy-provider; webpack",
@@ -24,6 +24,7 @@
     "@types/service-worker-mock": "^2.0.1",
     "@typescript-eslint/eslint-plugin": "^4.16.1",
     "@typescript-eslint/parser": "^4.16.1",
+    "edge-mock": "^0.0.15",
     "eslint": "^7.21.0",
     "eslint-config-prettier": "^8.1.0",
     "eslint-config-typescript": "^3.0.0",
