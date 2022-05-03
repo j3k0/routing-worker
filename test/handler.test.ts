@@ -5,7 +5,7 @@ import live_fetch from 'edge-mock/live_fetch'
 import { QUERY_PARAMETER } from '../src/constants'
 
 declare var global: any
-const DEFAULT_URL = 'https://fancyhints.com'
+const DEFAULT_URL = 'https://billing.fovea.cc'
 const MATCHED1_URL = 'https://www.google.com'
 const MATCHED2_URL = 'https://reqres.in'
 
@@ -46,7 +46,7 @@ describe('handle', () => {
 
   test('handle GET for default route', async () => {
     const result = await handleRequest(new Request('?foo=1', { method: 'GET' }))
-    expect(result.url).toEqual('https://fancyhints.com/?foo=1')
+    expect(result.url).toEqual('https://billing.fovea.cc/?foo=1')
     expect(result.status).toEqual(200)
   })
 
@@ -100,7 +100,7 @@ describe('handle', () => {
         },
       }),
     )
-    expect(result.url).toEqual('https://fancyhints.com/?foo=1')
+    expect(result.url).toEqual('https://billing.fovea.cc/?foo=1')
     expect(result.status).toEqual(200)
   })
 
