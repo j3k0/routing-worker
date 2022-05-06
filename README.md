@@ -27,6 +27,37 @@ The authorization header needs to be specified with this format: `Basic ${base64
 
 The `user` part can be used as a routing key. Enable this by setting `const USE_BASIC_AUTHORIZATION_HEADER = true` in the first line of code.
 
+## Environment configuration
+
+### Adding environment variables via wrangler
+Environment variables are defined via the [vars] configuration in your wrangler.toml file and are always plaintext values.
+```
+# Define top-level environment variables
+# under the `[vars]` block using
+# the `key = "value"` format
+[vars]
+QUERY_PARAMETER = "my-query-parameter"
+USE_BASIC_AUTHORIZATION_HEADER = "true"
+DEFAULT_KEY = "$default"
+
+# Override values for `--env production` usage
+[env.production]
+name = "router-worker-prod"
+[env.production.vars]
+QUERY_PARAMETER = "my-query-parameter"
+USE_BASIC_AUTHORIZATION_HEADER = "true"
+DEFAULT_KEY = "$default"
+```
+
+The variables can be added also from the dashboard, and/or can be adjusted and changed.
+1- Go to your Workers script > Settings > Add variable under Environment Variables.
+2- Input a Variable name and its value, which will be made available to your Worker.
+3- If your variable is a secret, select Encrypt to protect its value. This will prevent the value from being visible via wrangler and the dashboard.
+4- (Optional) To add multiple environment variables, select Add variable.
+5- Select Save to implement your changes.
+
+
+
 ## Selecting a backend
 
 The routing worker will fetch the configuration from the KV store, using the Routing Key as a key. The value contains the URL (`<protocol>://<host>:<port`) where to send the request to. The request is then forwarded to the appropriate backend. _Note: see [this example](https://developers.cloudflare.com/workers/examples/ab-testing/), however in our case we also have to support `POST` requests (forwarding the request body)_

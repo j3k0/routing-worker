@@ -1,5 +1,10 @@
+declare global {
+  const DEFAULT_KEY: string;
+  const QUERY_PARAMETER: string;
+  const USE_BASIC_AUTHORIZATION_HEADER: string;
+}
+
 import { getRoute } from "./cache";
-import { DEFAULT_KEY, QUERY_PARAMETER, USE_BASIC_AUTHORIZATION_HEADER } from "./constants";
 
 /**
  * Parse HTTP Basic Authorization value.
@@ -43,14 +48,14 @@ const getRouteBasedOnRequestParams = async (request: Request) => {
   const url = new URL(request.url);
   // Assuming your GET parameter is "param" (i.e. ?param=value)
   const qs_val = url.searchParams.get(QUERY_PARAMETER);
-  if (!qs_val && !USE_BASIC_AUTHORIZATION_HEADER) {
+  if (!qs_val && USE_BASIC_AUTHORIZATION_HEADER === 'false') {
     const route = await getRoute(DEFAULT_KEY);
     return route ? route.url : undefined;
   }
 
   if (qs_val) {
     const route = await getRoute(qs_val);
-    if (!route && !USE_BASIC_AUTHORIZATION_HEADER) {
+    if (!route && USE_BASIC_AUTHORIZATION_HEADER === 'false') {
       const route = await getRoute(DEFAULT_KEY);
       return route ? route.url : undefined;
     }
@@ -59,7 +64,7 @@ const getRouteBasedOnRequestParams = async (request: Request) => {
       return route.url;
   }
 
-  if (USE_BASIC_AUTHORIZATION_HEADER && request.headers.has('Authorization')) {
+  if (USE_BASIC_AUTHORIZATION_HEADER === 'true' && request.headers.has('Authorization')) {
     const { user } = basicAuthentication(request);
     if (!user) {
       const route = await getRoute(DEFAULT_KEY);
@@ -110,16 +115,15 @@ const readRequestBody = async (request: Request) => {
  * @param {Request} request
  */
 export async function handleRequest(request: Request): Promise<Response> {
-
-  const urlToRoute = await getRouteBasedOnRequestParams(request);
-
-  if (!urlToRoute) {
-    return new Response('No route found', {
-      status: 403
-    });
-  }
-
   try {
+    const urlToRoute = await getRouteBasedOnRequestParams(request);
+
+    if (!urlToRoute) {
+      return new Response('No route found', {
+        status: 403
+      });
+    }
+
     // forward the request to the origin server with the submitted POST data and append an extra header
 
     const method = request.method;

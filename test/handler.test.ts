@@ -2,12 +2,17 @@ import { handleRequest } from '../src/handler'
 import { EdgeKVNamespace, makeEdgeEnv } from 'edge-mock'
 // import makeServiceWorkerEnv from 'service-worker-mock'
 import live_fetch from 'edge-mock/live_fetch'
-import { QUERY_PARAMETER } from '../src/constants'
 
 declare var global: any
 const DEFAULT_URL = 'https://fancyhints.com'
 const MATCHED1_URL = 'https://www.google.com'
 const MATCHED2_URL = 'https://reqres.in'
+
+const constants = {
+  DEFAULT_KEY: "$default",
+  QUERY_PARAMETER: 'my-query-parameter',
+  USE_BASIC_AUTHORIZATION_HEADER: 'true'
+}
 
 const BODY_POST = {
   name: 'morpheus',
@@ -28,6 +33,7 @@ describe('handle', () => {
       bob: MATCHED2_URL,
     })
     Object.assign(global, { ROUTING_KEYS, fetch: live_fetch })
+    Object.assign(global, constants);
 
     if (typeof btoa === 'undefined') {
       global.btoa = function (str: string) {
