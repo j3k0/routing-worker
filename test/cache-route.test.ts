@@ -7,6 +7,12 @@ const DEFAULT_URL = 'https://fancyhints.com'
 const MATCHED1_URL = 'https://google.com'
 const MATCHED2_URL = 'https://yahoo.com'
 
+const constants = {
+    DEFAULT_KEY: "$default",
+    QUERY_PARAMETER: 'my-query-parameter',
+    USE_BASIC_AUTHORIZATION_HEADER: 'true'
+}
+
 describe('cache-route', () => {
     beforeEach(async () => {
         makeEdgeEnv()
@@ -17,8 +23,9 @@ describe('cache-route', () => {
             alice: MATCHED1_URL,
             bob: MATCHED2_URL,
         })
-        Object.assign(global, { ROUTING_KEYS })
-        jest.resetModules()
+        Object.assign(global, { ROUTING_KEYS, });
+        Object.assign(global, constants);
+        jest.resetModules();
     })
 
     test('fill routes into internal cache', async () => {

@@ -1,9 +1,7 @@
 
 declare global {
-    const ROUTING_KEYS: KVNamespace
+    const ROUTING_KEYS: KVNamespace;
 }
-
-import { DEFAULT_KEY } from "./constants";
 
 type Route = {
     url: string;

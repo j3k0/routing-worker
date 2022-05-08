@@ -9,7 +9,23 @@ compatibility_date = "2022-04-22"
 kv_namespaces = [
   { binding = "ROUTING_KEYS", id = "df86f4732c244883ab411329135e472a" }
 ]
- 
+
+# Define top-level environment variables
+# under the `[vars]` block using
+# the `key = "value"` format
+[vars]
+QUERY_PARAMETER = "my-query-parameter"
+USE_BASIC_AUTHORIZATION_HEADER = "true"
+DEFAULT_KEY = "$default"
+
+# Override values for `--env production` usage
+[env.production]
+name = "my-worker-production"
+[env.production.vars]
+QUERY_PARAMETER = "my-query-parameter"
+USE_BASIC_AUTHORIZATION_HEADER = "true"
+DEFAULT_KEY = "$default"
+
 [build]
 command = "npm install && npm run build"
 [build.upload]
