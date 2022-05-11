@@ -117,7 +117,8 @@ export async function handleRequest(request: Request): Promise<Response> {
     url.pathname = requestUrl.pathname
     url.search = requestUrl.search
 
-    new_request_headers.set('Referer', url.protocol + '//' + url.hostname);
+    new_request_headers.set('Referer', request.url);
+    new_request_headers.set('Host', url.hostname);
 
     let requestOptions = {
       method: method,
