@@ -68,32 +68,9 @@ const getRouteBasedOnRequestParams = async (request: Request) => {
   return route ? route.url : undefined;
 }
 
-const readRequestBody = async (request: Request) => {
-  const { headers } = request;
-  const contentType = headers.get('content-type') || '';
-
-  if (contentType.includes('application/json')) {
-    return JSON.stringify(await request.json());
-  } else if (contentType.includes('application/text')) {
-    return request.text();
-  } else if (contentType.includes('text/html')) {
-    return request.text();
-  } /*else if (contentType.includes('form')) {
-    const formData = await request.formData();
-    const body = {};
-    for (const entry of formData.entries()) {
-      body[entry[0]] = entry[1];
-    }
-    return JSON.stringify(body);
-  }*/ else {
-    // Perhaps some other type of data was submitted in the form
-    // like an image, or some other binary data.
-    return 'a file';
-  }
-}
-
 /**
- * Respond with hello worker text
+ * Proxy the request to the appropriate backend server based on configuration in KV database
+ * 
  * @param {Request} request
  */
 export async function handleRequest(request: Request): Promise<Response> {
@@ -120,14 +97,18 @@ export async function handleRequest(request: Request): Promise<Response> {
     new_request_headers.set('Referer', request.url);
     new_request_headers.set('Host', url.hostname);
 
-    let requestOptions = {
+    const requestOptions: RequestInitializerDict = {
       method: method,
       headers: new_request_headers
     };
 
     if (method === 'POST' || method === 'PUT') {
-      const body = await readRequestBody(request);
-      requestOptions = Object.assign(requestOptions, { body });
+      // Do we really have to parse the request body?
+      // We can pass it as is, since the correct content-type is already in the headers.
+      // Use the stream version, so very large are handled without large memory usage.
+      requestOptions.body = request.body;
+      // const body = await readRequestBody(request);
+      // requestOptions = Object.assign(requestOptions, { body });
     }
     const response = await fetch(
       decodeURIComponent(url.origin + url.pathname + requestUrl.search),
