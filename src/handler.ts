@@ -125,15 +125,14 @@ export async function handleRequest(request: Request): Promise<Response> {
       headers: new_request_headers
     };
 
-    if (method == 'POST') {
+    if (method === 'POST' || method === 'PUT') {
       const body = await readRequestBody(request);
       requestOptions = Object.assign(requestOptions, { body });
     }
     const response = await fetch(
       decodeURIComponent(url.origin + url.pathname + requestUrl.search),
-      requestOptions,
-    )
-    return response
+      requestOptions);
+    return response;
   } catch (err) {
     return new Response(`error!: ${err}`, { status: 500 }); // return 500 Status with Error
   }
