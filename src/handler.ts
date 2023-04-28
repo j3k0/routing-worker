@@ -68,6 +68,11 @@ const getRouteBasedOnRequestParams = async (request: Request) => {
   return route ? route.url : undefined;
 }
 
+function isRoutingInfoRequest(pathname: string): boolean {
+  const i = pathname.indexOf('_routing_info');
+  return i >= 0 && i <= 1;
+}
+
 /**
  * Proxy the request to the appropriate backend server based on configuration in KV database
  * 
@@ -93,6 +98,10 @@ export async function handleRequest(request: Request): Promise<Response> {
     const requestUrl = new URL(request.url)
     url.pathname = requestUrl.pathname
     url.search = requestUrl.search
+
+    if (isRoutingInfoRequest(requestUrl.pathname)) {
+      return new Response(urlToRoute, { status: 200 });
+    }
 
     new_request_headers.set('Referer', request.url);
     new_request_headers.set('Host', url.hostname);
