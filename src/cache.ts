@@ -55,17 +55,17 @@ async function* listAll(namespace: KVNamespace, options?: KVNamespaceListOptions
 
 export const getRoute = async (key: string) => {
 
-    if (Object.keys(backendConfigurationCache).length === 0) {
-        //fill local cache from KVs.
-        for await (const k of listAll(ROUTING_KEYS)) {
-            // use values
-            const value = await getCache(k.name);
-            backendConfigurationCache[k.name] = {
-                url: value as string,
-                expiresAt: getExpirationDate()
-            }
-        }
-    }
+    // if (Object.keys(backendConfigurationCache).length === 0) {
+    //     //fill local cache from KVs.
+    //     for await (const k of listAll(ROUTING_KEYS)) {
+    //         // use values
+    //         const value = await getCache(k.name);
+    //         backendConfigurationCache[k.name] = {
+    //             url: value as string,
+    //             expiresAt: getExpirationDate()
+    //         }
+    //     }
+    // }
 
     if (!backendConfigurationCache[key] || isExpired(backendConfigurationCache[key])) {
         const value = await getCache(key);
