@@ -45,7 +45,45 @@ const basicAuthentication = (request: Request) => {
   };
 }
 
+/**
+ * Extracts the key from cookies.
+ *
+ * This function retrieves the 'Cookie' header from the request, parses it to find the QUERY_PARAMETER cookie,
+ * and returns its value. If the 'Cookie' header is not present or the given cookie is not found,
+ * the function returns null.
+ *
+ * @param {Request} request - The request object from which to extract the cookie.
+ * @returns {string | null} The value of the cookie if it exists, otherwise null.
+ */
+const getKeyFromCookie = (request: Request): string | null => {
+
+  // Get the Cookie header from the request
+  const cookieHeader = request.headers.get('Cookie');
+ 
+  if (!cookieHeader) {
+     // If there's no Cookie header, return null
+     return null;
+  }
+ 
+  // Split the Cookie header into individual cookies
+  const cookies = cookieHeader.split(';');
+ 
+  // Find the appName cookie
+  const paramCookie = cookies.find(cookie => cookie.trim().startsWith(QUERY_PARAMETER + '='));
+ 
+  if (!paramCookie) {
+     // If there's no cookie, return null
+     return null;
+  }
+ 
+  // Extract the value of the cookie
+  const cookieValue = paramCookie.split('=')[1];
+ 
+  return cookieValue;
+ }
+
 const getRouteBasedOnRequestParams = async (request: Request) => {
+
   const url = new URL(request.url);
 
   // Assuming your GET parameter is "param" (i.e. ?param=value)
@@ -56,6 +94,7 @@ const getRouteBasedOnRequestParams = async (request: Request) => {
       return route.url;
   }
 
+  // Use the Authorization header
   if (USE_BASIC_AUTHORIZATION_HEADER === 'true' && request.headers.has('Authorization')) {
     const { user } = basicAuthentication(request);
     if (user) {
@@ -63,6 +102,14 @@ const getRouteBasedOnRequestParams = async (request: Request) => {
       if (route)
         return route.url;
     }
+  }
+
+  // Find a cookie with the name equal to "param" (QUERY_PARAMETER)
+  const cookie_val = getKeyFromCookie(request);
+  if (cookie_val) {
+    const route = await getRoute(url.hostname, cookie_val);
+    if (route)
+      return route.url;
   }
 
   const route = await getRoute(url.hostname, DEFAULT_KEY);
