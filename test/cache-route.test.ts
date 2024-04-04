@@ -30,18 +30,18 @@ describe('cache-route', () => {
 
     test('fill routes into internal cache', async () => {
         expect(backendConfigurationCache).toEqual({})
-        const route = await getRoute('test')
-        expect(Object.keys(backendConfigurationCache).length).toEqual(3)
+        await getRoute('example.com', 'test')
+        expect(Object.keys(backendConfigurationCache).length).toEqual(1)
     })
 
     test('return default url if key not found', async () => {
-        const route = await getRoute('test')
+        const route = await getRoute('example.com', 'test')
         expect(route).not.toBeUndefined()
         expect(route?.url).toEqual(DEFAULT_URL)
     })
 
     test('return routed url if key is matched', async () => {
-        const route = await getRoute('alice')
+        const route = await getRoute('example.com', 'alice')
         expect(route).not.toBeUndefined()
         expect(route?.url).toEqual(MATCHED1_URL)
     })
@@ -52,7 +52,7 @@ describe('cache-route', () => {
         backendConfigurationCache['alice'].expiresAt = expiredDate
 
         expect(isExpired(backendConfigurationCache['alice'])).toEqual(true)
-        const route = await getRoute('alice')
+        const route = await getRoute('example.com', 'alice')
         expect(route).not.toBeUndefined()
         expect(route?.url).toEqual(MATCHED1_URL)
         expect(route?.expiresAt.getTime()).toBeGreaterThan(new Date().getTime())

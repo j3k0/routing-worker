@@ -34,6 +34,7 @@ const basicAuthentication = (request: Request) => {
 
   // The user & password are split by the first colon and MUST NOT contain control characters.
   // @see https://tools.ietf.org/html/rfc5234#appendix-B.1 (=> "CTL = %x00-1F / %x7F")
+  /*eslint no-control-regex: "off"*/
   if (index === -1 || /[\0-\x1F\x7F]/.test(decoded)) {
     return {};
   }
