@@ -50,7 +50,7 @@ const getRouteBasedOnRequestParams = async (request: Request) => {
   // Assuming your GET parameter is "param" (i.e. ?param=value)
   const qs_val = url.searchParams.get(QUERY_PARAMETER);
   if (qs_val) {
-    const route = await getRoute(qs_val);
+    const route = await getRoute(url.hostname, qs_val);
     if (route)
       return route.url;
   }
@@ -58,13 +58,13 @@ const getRouteBasedOnRequestParams = async (request: Request) => {
   if (USE_BASIC_AUTHORIZATION_HEADER === 'true' && request.headers.has('Authorization')) {
     const { user } = basicAuthentication(request);
     if (user) {
-      const route = await getRoute(user);
+      const route = await getRoute(url.hostname, user);
       if (route)
         return route.url;
     }
   }
 
-  const route = await getRoute(DEFAULT_KEY);
+  const route = await getRoute(url.hostname, DEFAULT_KEY);
   return route ? route.url : undefined;
 }
 

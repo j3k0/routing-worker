@@ -62,7 +62,9 @@ The variables can be added also from the dashboard, and/or can be adjusted and c
 
 The routing worker will fetch the configuration from the KV store, using the Routing Key as a key. The value contains the URL (`<protocol>://<host>:<port`) where to send the request to. The request is then forwarded to the appropriate backend. _Note: see [this example](https://developers.cloudflare.com/workers/examples/ab-testing/), however in our case we also have to support `POST` requests (forwarding the request body)_
 
-In case no value is found for this routing key, configuration should be retrieved from the `$default` key in the KV store.
+In case no value is found for this routing key, configuration should be retrieved:
+- from the `$redirect.<domain>` key in the KV store.
+- if not set, from the `$default` key in the KV store.
 
 ## Caching
 

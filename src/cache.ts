@@ -13,48 +13,59 @@ export const backendConfigurationCache: {
 } = {}
 
 const getExpirationDate = (): Date => {
-    var expireAt = new Date();
+    const expireAt = new Date();
     expireAt.setHours(expireAt.getHours() + 4);// add 4 hours for expiration
     return expireAt;
 }
 export const isExpired = (item: Route): boolean => {
-    var now = new Date()
+    const now = new Date()
     return item.expiresAt < now
 }
 
+const getDefaultKey = (hostname: string | null) => {
+    if (!hostname) return DEFAULT_KEY;
+    return '$redirect.' + hostname;
+}
 const getCache = (key: string) => ROUTING_KEYS.get(key);
-const getDefaultRoute = async () => {
+const getDefaultRoute = async (hostname: string | null): Promise<Route | undefined> => {
 
-    if (!backendConfigurationCache[DEFAULT_KEY] || isExpired(backendConfigurationCache[DEFAULT_KEY])) {
-        const value = await getCache(DEFAULT_KEY);
+    const defaultKey = getDefaultKey(hostname);
+    if (!backendConfigurationCache[defaultKey] || isExpired(backendConfigurationCache[defaultKey])) {
+        const value = await getCache(defaultKey);
         if (!value) {
-            return undefined;
+            if (!hostname)
+                return undefined;
+            else
+                return getDefaultRoute(null);
         }
-        backendConfigurationCache[DEFAULT_KEY] = {
+        backendConfigurationCache[defaultKey] = {
             url: value,
             expiresAt: getExpirationDate()
         }
     }
-    return backendConfigurationCache[DEFAULT_KEY];
+    return backendConfigurationCache[defaultKey];
 }
 
-async function* listAll(namespace: KVNamespace, options?: KVNamespaceListOptions) {
-    let cursor;
-    let hasNextPage = true;
-    while (hasNextPage) {
-        const results = await namespace.list<string>({ ...options, cursor })
-        const { keys: queue } = results
-        hasNextPage = !results.list_complete
+// async function* listAll(namespace: KVNamespace, options?: KVNamespaceListOptions) {
+//     let cursor;
+//     let hasNextPage = true;
+//     while (hasNextPage) {
+//         const results = await namespace.list<string>({ ...options, cursor })
+//         const { keys: queue } = results
+//         hasNextPage = !results.list_complete
 
-        while (queue.length > 0) {
-            const key = queue.shift()
-            if (key !== undefined) yield key
-        }
+//         while (queue.length > 0) {
+//             const key = queue.shift()
+//             if (key !== undefined) yield key
+//         }
+//     }
+// }
+
+export const getRoute = async (hostname: string | null, key: string): Promise<Route | undefined> => {
+
+    if (key === DEFAULT_KEY || !key) {
+        return await getDefaultRoute(hostname);
     }
-}
-
-export const getRoute = async (key: string) => {
-
     // if (Object.keys(backendConfigurationCache).length === 0) {
     //     //fill local cache from KVs.
     //     for await (const k of listAll(ROUTING_KEYS)) {
@@ -70,7 +81,7 @@ export const getRoute = async (key: string) => {
     if (!backendConfigurationCache[key] || isExpired(backendConfigurationCache[key])) {
         const value = await getCache(key);
         if (!value) {
-            return await getDefaultRoute();
+            return await getDefaultRoute(hostname);
         }
         backendConfigurationCache[key] = {
             url: value,
