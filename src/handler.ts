@@ -156,7 +156,8 @@ export async function handleRequest(request: Request): Promise<Response> {
 
     const requestOptions: RequestInitializerDict = {
       method: method,
-      headers: new_request_headers
+      headers: new_request_headers,
+      redirect: "manual",
     };
 
     if (method === 'POST' || method === 'PUT') {
