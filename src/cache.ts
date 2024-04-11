@@ -24,8 +24,14 @@ export const isExpired = (item: Route): boolean => {
 
 const getDefaultKey = (hostname: string | null) => {
     if (!hostname) return DEFAULT_KEY;
-    return '$redirect.' + hostname;
+    return '$default.' + hostname;
 }
+
+const getForcedKey = (hostname: string | null) => {
+    if (!hostname) return;
+    return '$forced.' + hostname;
+}
+
 const getCache = (key: string) => ROUTING_KEYS.get(key);
 const getDefaultRoute = async (hostname: string | null): Promise<Route | undefined> => {
 
@@ -44,6 +50,23 @@ const getDefaultRoute = async (hostname: string | null): Promise<Route | undefin
         }
     }
     return backendConfigurationCache[defaultKey];
+}
+
+const getForcedRoute = async (hostname: string | null): Promise<Route | undefined> => {
+
+    const forcedKey = getForcedKey(hostname);
+    if (!forcedKey) return;
+    if (!backendConfigurationCache[forcedKey] || isExpired(backendConfigurationCache[forcedKey])) {
+        const value = await getCache(forcedKey);
+        if (!value) {
+            return;
+        }
+        backendConfigurationCache[forcedKey] = {
+            url: value,
+            expiresAt: getExpirationDate()
+        }
+    }
+    return backendConfigurationCache[forcedKey];
 }
 
 // async function* listAll(namespace: KVNamespace, options?: KVNamespaceListOptions) {
@@ -66,6 +89,10 @@ export const getRoute = async (hostname: string | null, key: string): Promise<Ro
     if (key === DEFAULT_KEY || !key) {
         return await getDefaultRoute(hostname);
     }
+
+    const forcedRoute = await getForcedRoute(hostname);
+    if (forcedRoute) return forcedRoute;
+
     // if (Object.keys(backendConfigurationCache).length === 0) {
     //     //fill local cache from KVs.
     //     for await (const k of listAll(ROUTING_KEYS)) {
