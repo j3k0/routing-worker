@@ -152,6 +152,7 @@ export async function handleRequest(request: Request): Promise<Response> {
     }
 
     new_request_headers.set('Referer', request.url);
+    new_request_headers.set('X-Forwarded-Host', requestUrl.hostname);
     new_request_headers.set('Host', url.hostname);
 
     const requestOptions: RequestInitializerDict = {
