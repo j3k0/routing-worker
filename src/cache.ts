@@ -86,12 +86,16 @@ const getForcedRoute = async (hostname: string | null): Promise<Route | undefine
 
 export const getRoute = async (hostname: string | null, key: string): Promise<Route | undefined> => {
 
-    if (key === DEFAULT_KEY || !key) {
+    if (key === DEFAULT_KEY) {
         return await getDefaultRoute(hostname);
     }
 
     const forcedRoute = await getForcedRoute(hostname);
     if (forcedRoute) return forcedRoute;
+
+    if (!key) {
+        return await getDefaultRoute(hostname);
+    }
 
     // if (Object.keys(backendConfigurationCache).length === 0) {
     //     //fill local cache from KVs.
